@@ -1,13 +1,19 @@
 import { useEffect, useState } from "react";
 import { TFeedbackItem } from "../lib/types";
-import Container from "./Container";
-import Footer from "./Footer";
+import Container from "./layout/Container";
+import Footer from "./layout/Footer";
 import HashtagList from "./HashtagList";
 
 function App() {
   const [feedbackItems, setFeedbackItems] = useState<TFeedbackItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const companyList = feedbackItems
+    .map((item) => item.company)
+    .filter((company, index, array) => {
+      return array.indexOf(company) === index;
+    });
 
   const handleAddToList = async (text: string) => {
     const companyName = text
@@ -69,7 +75,7 @@ function App() {
         errorMessage={errorMessage}
         handleAddToList={handleAddToList}
       />
-      <HashtagList />
+      <HashtagList companyList={companyList} />
     </div>
   );
 }
