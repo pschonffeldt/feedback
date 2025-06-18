@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { TFeedbackItem } from "../lib/types";
 import Container from "./layout/Container";
 import Footer from "./layout/Footer";
@@ -10,16 +10,24 @@ function App() {
   const [errorMessage, setErrorMessage] = useState("");
   const [slectedCompany, setSelectedCompany] = useState("");
 
-  const filteredFeedbackItems = slectedCompany
-    ? feedbackItems.filter(
-        (feedbackItem) => feedbackItem.company === slectedCompany
-      )
-    : feedbackItems;
-  const companyList = feedbackItems
-    .map((item) => item.company)
-    .filter((company, index, array) => {
-      return array.indexOf(company) === index;
-    });
+  const filteredFeedbackItems = useMemo(
+    () =>
+      slectedCompany
+        ? feedbackItems.filter(
+            (feedbackItem) => feedbackItem.company === slectedCompany
+          )
+        : feedbackItems,
+    [feedbackItems, slectedCompany]
+  );
+  const companyList = useMemo(
+    () =>
+      feedbackItems
+        .map((item) => item.company)
+        .filter((company, index, array) => {
+          return array.indexOf(company) === index;
+        }),
+    [feedbackItems]
+  );
 
   const handleAddToList = async (text: string) => {
     const companyName = text
