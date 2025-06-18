@@ -1,14 +1,17 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useMemo, useState } from "react";
 import { TFeedbackItem } from "../lib/types";
+import { useFeedbackItems } from "../lib/hooks";
 
-type FeedbackItemsContextProviderProps = { children: React.ReactNode };
+type FeedbackItemsContextProviderProps = {
+  children: React.ReactNode;
+};
 
 type TFeedbackItemsContext = {
+  filteredFeedbackItems: TFeedbackItem[];
   isLoading: boolean;
   errorMessage: string;
   companyList: string[];
   handleAddToList: (text: string) => void;
-  filteredFeedbackItems: TFeedbackItem[];
   handleSelectCompany: (company: string) => void;
 };
 
@@ -19,10 +22,9 @@ export const FeedbackItemsContext = createContext<TFeedbackItemsContext | null>(
 export default function FeedbackItemsContextProvider({
   children,
 }: FeedbackItemsContextProviderProps) {
-  const [feedbackItems, setFeedbackItems] = useState<TFeedbackItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [slectedCompany, setSelectedCompany] = useState("");
+  const { feedbackItems, isLoading, errorMessage, setFeedbackItems } =
+    useFeedbackItems();
+  const [selectedCompany, setSelectedCompany] = useState("");
 
   const companyList = useMemo(
     () =>
@@ -35,13 +37,14 @@ export default function FeedbackItemsContextProvider({
   );
   const filteredFeedbackItems = useMemo(
     () =>
-      slectedCompany
+      selectedCompany
         ? feedbackItems.filter(
-            (feedbackItem) => feedbackItem.company === slectedCompany
+            (feedbackItem) => feedbackItem.company === selectedCompany
           )
         : feedbackItems,
-    [feedbackItems, slectedCompany]
+    [feedbackItems, selectedCompany]
   );
+
   const handleAddToList = async (text: string) => {
     const companyName = text
       .split(" ")
@@ -71,39 +74,18 @@ export default function FeedbackItemsContextProvider({
       }
     );
   };
-
   const handleSelectCompany = (company: string) => {
     setSelectedCompany(company);
   };
 
-  useEffect(() => {
-    const fetchFeedbackItems = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch(
-          "https://bytegrad.com/course-assets/projects/corpcomment/api/feedbacks"
-        );
-        if (!response.ok) {
-          throw new Error();
-        }
-        const data = await response.json();
-        setFeedbackItems(data.feedbacks);
-      } catch (error) {
-        setErrorMessage("Something went wrong. Please try again later.");
-      }
-
-      setIsLoading(false);
-    };
-    fetchFeedbackItems();
-  }, []);
   return (
     <FeedbackItemsContext.Provider
       value={{
+        filteredFeedbackItems,
         isLoading,
         errorMessage,
         companyList,
         handleAddToList,
-        filteredFeedbackItems,
         handleSelectCompany,
       }}
     >

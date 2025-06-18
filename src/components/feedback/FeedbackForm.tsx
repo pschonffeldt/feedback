@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { MAX_CHARACTERS } from "../../lib/contants";
 
-type FeedbackFromProps = {
+type FeedbackFormProps = {
   onAddToList: (text: string) => void;
 };
 
-export default function FeedbackForm({ onAddToList }: FeedbackFromProps) {
+export default function FeedbackForm({ onAddToList }: FeedbackFormProps) {
   const [text, setText] = useState("");
-  const [showValidIndicator, setshowValidIndicator] = useState(false);
-  const [showInvalidIndicator, setshowInvalidIndicator] = useState(false);
+  const [showValidIndicator, setShowValidIndicator] = useState(false);
+  const [showInvalidIndicator, setShowInvalidIndicator] = useState(false);
   const charCount = MAX_CHARACTERS - text.length;
 
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -16,19 +16,22 @@ export default function FeedbackForm({ onAddToList }: FeedbackFromProps) {
     if (newText.length > MAX_CHARACTERS) {
       return;
     }
-    setText(event.target.value);
+    setText(newText);
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    // basic validation
     if (text.includes("#") && text.length >= 5) {
-      setshowValidIndicator(true);
-      setTimeout(() => setshowValidIndicator(false), 2000);
+      setShowValidIndicator(true);
+      setTimeout(() => setShowValidIndicator(false), 2000);
     } else {
-      setshowInvalidIndicator(true);
-      setTimeout(() => setshowInvalidIndicator(false), 2000);
+      setShowInvalidIndicator(true);
+      setTimeout(() => setShowInvalidIndicator(false), 2000);
       return;
     }
+
     onAddToList(text);
     setText("");
   };
@@ -44,16 +47,18 @@ export default function FeedbackForm({ onAddToList }: FeedbackFromProps) {
         value={text}
         onChange={handleChange}
         id="feedback-textarea"
-        placeholder="Tula"
+        placeholder="blabla"
         spellCheck={false}
       />
-      <label>
-        Enter your feedback here, remember to #hashtag your colleague
+
+      <label htmlFor="feedback-textarea">
+        Enter your feedback here, remember to #hashtag the company
       </label>
+
       <div>
         <p className="u-italic">{charCount}</p>
         <button>
-          <span>SUBMIT</span>
+          <span>Submit</span>
         </button>
       </div>
     </form>
